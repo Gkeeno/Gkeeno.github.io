@@ -3,17 +3,17 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle:
+title: Riff
+subtitle: 每天晚上、辣个男人、打开Visu⚪⚪⚪...
 description:
 keywords:
-author: John Doe
+author: Gkeeno
 language: zh-CN
 timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: http://Gkeeno.github.io/
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
