@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="不可避免地会出现以下概念，希望在阅读前能理解：  angular6 的打包和初始化 基础的nodejs编程   前言为何要部署前端服务器？分离前后端要知晓这个概念，首先就要区别出前后端的概念。在传统的web应用开发中，大多数会将浏览器作为区别前后端的标准：为用户展示界面的部分称为前端，为界面提供数据或提供业务逻辑服务的称为后端。 而在 传统单体应用 开发模式中，所有的页面都和后端代码放在一个项目">
+<meta property="og:type" content="article">
+<meta property="og:title" content="angular6+koa+pm2部署前端服务器">
+<meta property="og:url" content="http://Gkeeno.github.io/2018/08/11/angular6-koa-pm2部署前端服务器/index.html">
+<meta property="og:site_name" content="Riff">
+<meta property="og:description" content="不可避免地会出现以下概念，希望在阅读前能理解：  angular6 的打包和初始化 基础的nodejs编程   前言为何要部署前端服务器？分离前后端要知晓这个概念，首先就要区别出前后端的概念。在传统的web应用开发中，大多数会将浏览器作为区别前后端的标准：为用户展示界面的部分称为前端，为界面提供数据或提供业务逻辑服务的称为后端。 而在 传统单体应用 开发模式中，所有的页面都和后端代码放在一个项目">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wx1.sinaimg.cn/mw690/0060lm7Tly1fu5llb3mwhj30m80a2gmg.jpg">
+<meta property="og:image" content="http://chuantu.biz/t6/356/1533969881x-1566660829.png">
+<meta property="og:image" content="http://chuantu.biz/t6/356/1533972158x-1566661044.png">
+<meta property="og:image" content="http://chuantu.biz/t6/356/1533973186x-1404781120.png">
+<meta property="og:image" content="http://chuantu.biz/t6/356/1533976856x-1404758437.png">
+<meta property="og:image" content="http://chuantu.biz/t6/356/1533977903x-1404795589.png">
+<meta property="og:image" content="http://chuantu.biz/t6/356/1533978560x-1404781120.png">
+<meta property="og:updated_time" content="2018-11-24T06:21:47.014Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="angular6+koa+pm2部署前端服务器">
+<meta name="twitter:description" content="不可避免地会出现以下概念，希望在阅读前能理解：  angular6 的打包和初始化 基础的nodejs编程   前言为何要部署前端服务器？分离前后端要知晓这个概念，首先就要区别出前后端的概念。在传统的web应用开发中，大多数会将浏览器作为区别前后端的标准：为用户展示界面的部分称为前端，为界面提供数据或提供业务逻辑服务的称为后端。 而在 传统单体应用 开发模式中，所有的页面都和后端代码放在一个项目">
+<meta name="twitter:image" content="http://wx1.sinaimg.cn/mw690/0060lm7Tly1fu5llb3mwhj30m80a2gmg.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://Gkeeno.github.io/2018/08/11/angular6-koa-pm2部署前端服务器/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>angular6+koa+pm2部署前端服务器 | Riff</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Riff</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">每天晚上、辣个男人、打开Visu⚪⚪⚪...</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://Gkeeno.github.io/2018/08/11/angular6-koa-pm2部署前端服务器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Gkeeno">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Riff">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">angular6+koa+pm2部署前端服务器
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-08-11 17:36:07" itemprop="dateCreated datePublished" datetime="2018-08-11T17:36:07+08:00">2018-08-11</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-11-24 14:21:47" itemprop="dateModified" datetime="2018-11-24T14:21:47+08:00">2018-11-24</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>不可避免地会出现以下概念，希望在阅读前能理解：</p>
+<ul>
+<li>angular6 的打包和初始化</li>
+<li>基础的nodejs编程</li>
+</ul>
+</blockquote>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><h2 id="为何要部署前端服务器？"><a href="#为何要部署前端服务器？" class="headerlink" title="为何要部署前端服务器？"></a>为何要部署前端服务器？</h2><h3 id="分离前后端"><a href="#分离前后端" class="headerlink" title="分离前后端"></a>分离前后端</h3><p>要知晓这个概念，首先就要区别出前后端的概念。<br>在传统的web应用开发中，大多数会将浏览器作为区别前后端的标准：为用户展示界面的部分称为前端，为界面提供数据或提供业务逻辑服务的称为后端。</p>
+<p>而在 传统单体应用 开发模式中，所有的页面都和后端代码放在一个项目中，部署时也是整个项目部署，前端开发人员甚至还要掌握一些后端开发的知识才能输出代码。<br>为了让前后端分工更加明确，更好的各司其职，从长远来看，前后端分离也是一个必然的趋势和结果。</p>
+<h4 id="解耦代码"><a href="#解耦代码" class="headerlink" title="解耦代码"></a>解耦代码</h4><p><img src="http://wx1.sinaimg.cn/mw690/0060lm7Tly1fu5llb3mwhj30m80a2gmg.jpg" alt="code-repo"><br>在传统的 单体应用 开发模式中，所有的代码都放在同一个项目中，不能单独运行，这个时候的项目是 前后端未分离的。</p>
+<ul>
+<li><p><strong>半分离</strong><br>前后端共在一个项目，共用一个代码库，但是分别建立前端和后端的工程；<br>前端不用关心后端代码是怎么写的，后端也不用担心前端代码是什么样的，但整个项目不能单独运行，需要后端和前端进行交互。</p>
+</li>
+<li><p><strong>完全分离</strong><br>前后端分别建立项目，代码库相互独立；<br>前端能独立开发，依靠 mock程序或测试构造一个伪后端 运行<br>后端也能独立开发，编写有详细的测试用例，保证API的可用性，并做好详细的接口文档，使其跟前端能够顺利集成。</p>
+</li>
+</ul>
+<h4 id="解耦部署"><a href="#解耦部署" class="headerlink" title="解耦部署"></a>解耦部署</h4><p>在部署单体应用中，整个项目打包上服务器即可运行，这个时候的项目是前后端未分离的。</p>
+<p>部署半分离的前后端项目也是一样，发布整个项目即可。</p>
+<p>完全分离前后端后，前后端可单独部署，本章结即是讲解部署前端项目部分。</p>
+<blockquote>
+<p>⚠️ 前后端分离总体提升了部署和开发的复杂程度，对于小项目来说是过度设计，导致开发效率更低。</p>
+</blockquote>
+<h4 id="分离提升性能瓶颈"><a href="#分离提升性能瓶颈" class="headerlink" title="分离提升性能瓶颈"></a>分离提升性能瓶颈</h4><p>有时候前端的流量和后端不在一个量级上，分离前后端可以使前后端采用不同的架构设计，使系统更加强大。</p>
+<p>一些大厂的解决方案比如阿里云的控制台管理系统，部署时就采用反向代理服务器，把获取页面的请求路由到前端服务器，接口请求路由到后端服务器。  </p>
+<blockquote>
+<p>你甚至可以在http response 的 header 里看到所使用的反向代理服务器的名称。</p>
+</blockquote>
+<h2 id="为何要选择koa作为前端服务器？"><a href="#为何要选择koa作为前端服务器？" class="headerlink" title="为何要选择koa作为前端服务器？"></a>为何要选择koa作为前端服务器？</h2><p>Koa 是一个基于 nodejs 平台的下一代 web 开发框架，相对最初火热的 Express 框架来说充分利用async 等一套优雅的方法，摒弃了”难看”的多层callback嵌套，能够快速而愉快地编写服务端应用程序。</p>
+<p>而nodejs平台本身就具有着独特的异步、非阻塞I/O的特点，这也就意味着他特别适合I/O密集型操作，在处理并发量比较大的请求上能力比较强。<br>此外，现代web开发框架（angular,vue,react）都基本上利用nodejs平台搭建前端项目，使用nodejs能无缝集成前端项目；<br>前端项目打包生成静态文件后，直接运行nodejs程序，利用其高I/O向客户端提供静态文件，nodejs确实是一个不错的选择。</p>
+<h1 id="部署前端服务器"><a href="#部署前端服务器" class="headerlink" title="部署前端服务器"></a>部署前端服务器</h1><h2 id="运行环境介绍"><a href="#运行环境介绍" class="headerlink" title="运行环境介绍"></a>运行环境介绍</h2><p>服务器系统：centerOS 7 （64位）<br>本地环境： windows 10 （64位）<br>连接工具：<a href="http://mobaxterm.mobatek.net/" target="_blank" rel="noopener">MobaXterm</a></p>
+<p>我的服务器是在阿里云买的ECS，购买的时候直接选了centerOS 7，服务器上必须安装nodejs运行环境，如何安装在这里不做赘述。<br>安装完 nodejs 后用 npm 全局安装 pm2（一个nodejs程序托管系统），输入命令行<code>npm install -g pm2</code>即可。</p>
+<h2 id="前端项目介绍"><a href="#前端项目介绍" class="headerlink" title="前端项目介绍"></a>前端项目介绍</h2><p>项目采用angular+koa搭建的一个前端项目：<br><img src="http://chuantu.biz/t6/356/1533969881x-1566660829.png" alt="directory-tree">   </p>
+<ul>
+<li><code>dist/spa-server</code>是我们前端项目打包后的静态文件，展示网站主要就是输出这些文件。</li>
+<li><code>src</code> 是前端项目的源代码</li>
+<li>koa-app.js 是运行前端服务器的脚本</li>
+</ul>
+<ol>
+<li>先使用的angular cli生成前端项目脚手架，再使用<code>npm i koa koa-static koa-router</code>安装运行koa的依赖库。</li>
+<li>在项目根目录添加运行服务器的脚本 koa-app.js<br>添加以下基本代码:<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> koa = <span class="built_in">require</span>(<span class="string">"koa"</span>);</span><br><span class="line"><span class="keyword">const</span> router = <span class="built_in">require</span>(<span class="string">"koa-router"</span>)();</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">static</span> = <span class="built_in">require</span>(<span class="string">'koa-static'</span>); </span><br><span class="line"><span class="keyword">const</span> app = <span class="keyword">new</span> koa();</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">'fs'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> staticFileFolder = path.join(__dirname,<span class="string">"dist"</span>,<span class="string">"spa-server"</span>);</span><br><span class="line"><span class="keyword">var</span> indexPath = path.join(staticFileFolder,<span class="string">"index.html"</span>);</span><br><span class="line"><span class="comment">/******************************</span></span><br><span class="line"><span class="comment"> * Set Static File</span></span><br><span class="line"><span class="comment"> * 设置静态文件后访问该文件路径 会直接返回不会走下一个中间件</span></span><br><span class="line"><span class="comment"> *****************************/</span></span><br><span class="line">app.use(<span class="keyword">static</span>(</span><br><span class="line">  staticFileFolder</span><br><span class="line">));</span><br><span class="line"></span><br><span class="line"><span class="comment">/******************************</span></span><br><span class="line"><span class="comment"> * logger</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *****************************/</span></span><br><span class="line">app.use(<span class="keyword">async</span> (ctx, next) =&gt; &#123;</span><br><span class="line">  <span class="keyword">await</span> next();</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`<span class="subst">$&#123;ctx.method&#125;</span> : <span class="subst">$&#123;ctx.url&#125;</span> - <span class="subst">$&#123;hResponse&#125;</span>`</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">/******************************</span></span><br><span class="line"><span class="comment"> * Routes</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> *****************************/</span></span><br><span class="line"> <span class="comment">// 读取 index.html 的文件内容</span></span><br><span class="line"><span class="keyword">const</span> indexPage = fs.readFileSync(indexPath).toString();</span><br><span class="line"></span><br><span class="line">router.get(<span class="string">'*'</span>, <span class="keyword">async</span> (ctx, next) =&gt; &#123;</span><br><span class="line">  ctx.response.body = indexPage;</span><br><span class="line">&#125;); </span><br><span class="line">app.use(router.middleware())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 监听端口，启动服务器</span></span><br><span class="line">app.listen(<span class="number">80</span>);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>上面的代码在路由部分做了特殊的处理，因为使用angular6搭建的网页为单页面应用程序(SPA)，路由部分是由前端来处理的。<br>这种特性使得服务器要对请求的路径做出特殊响应：所有访问页面的路径都默认返回index.html的内容，然后交由前端的js来解析路径生成页面。<a href="https://angular.cn/guide/deployment" target="_blank" rel="noopener">可参考angular官网说明</a></p>
+<p>首先要在本地能够运行服务器，在项目根目录输入<code>node koa-app.js</code>运行服务器脚本。访问浏览器，页面如下:<br><img src="http://chuantu.biz/t6/356/1533972158x-1566661044.png" alt="page"><br>本地运行可以正常访问的话，接下来就可以正式部署到服务器上了。</p>
+<h2 id="部署到服务器"><a href="#部署到服务器" class="headerlink" title="部署到服务器"></a>部署到服务器</h2><h3 id="精简上传文件"><a href="#精简上传文件" class="headerlink" title="精简上传文件"></a>精简上传文件</h3><p>传输到服务器上运行的文件不必像本地开发一样，只需保留必须的文件即可，最终精简如下：<br><img src="http://chuantu.biz/t6/356/1533973186x-1404781120.png" alt="page"></p>
+<ul>
+<li><code>www</code> 是我们前端项目打包后的静态文件</li>
+<li><p>由于静态文件的文件夹的名称和路径都变了, koa-app.js 中需修改相应代码</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> staticFileFolder = path.join(__dirname,<span class="string">"dist"</span>,<span class="string">"spa-server"</span>); </span><br><span class="line"><span class="comment">// 改为如下:</span></span><br><span class="line"><span class="keyword">var</span> staticFileFolder = path.join(__dirname,<span class="string">"www"</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>deploys.json 这个新增的文件用来引导 pm2的运行，基本内容为:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"apps"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"name"</span>: <span class="string">"deploy-test1"</span>,</span><br><span class="line">      <span class="attr">"script"</span>: <span class="string">"./koa-app.js"</span>,</span><br><span class="line">      <span class="attr">"env"</span>: &#123;</span><br><span class="line">        <span class="attr">"COMMON_VARIABLE"</span>: <span class="string">"true"</span></span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">"env_production"</span>: &#123;</span><br><span class="line">        <span class="attr">"NODE_ENV"</span>: <span class="string">"production"</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><code>name</code> 是 托管到pm2上的程序名称<br><code>script</code> 是 程序的路径</p>
+<ul>
+<li>package.json 是nodejs程序的工程信息，随着项目初始化新建。包括我们程序的依赖项都在该处配置：<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"publish"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"1.0.0"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">    <span class="attr">"test"</span>: <span class="string">"echo \"Error: no test specified\" &amp;&amp; exit 1"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"author"</span>: <span class="string">""</span>,</span><br><span class="line">  <span class="attr">"license"</span>: <span class="string">"ISC"</span>,</span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"koa"</span>: <span class="string">"^2.5.2"</span>,</span><br><span class="line">    <span class="attr">"koa-router"</span>: <span class="string">"^7.4.0"</span>,</span><br><span class="line">    <span class="attr">"koa-static"</span>: <span class="string">"^5.0.0"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><code>dependencies</code> 即是程序的依赖项,必须保留 <code>koa</code>,<code>koa-router</code>,<code>koa-static</code></p>
+<h3 id="上传到服务器"><a href="#上传到服务器" class="headerlink" title="上传到服务器"></a>上传到服务器</h3><p>这里我使用 MobaXterm 作为远程工具:<br>保持目录结构,上传到服务器上，定位到项目的根目录位置下,输入<code>npm install</code>安装所有的依赖包，如下<br><img src="http://chuantu.biz/t6/356/1533976856x-1404758437.png" alt="linux-server"></p>
+<h3 id="运行程序"><a href="#运行程序" class="headerlink" title="运行程序"></a>运行程序</h3><p>安装完所有的依赖包程序就可以成功运行了,<br>还是定位到项目的根目录下，输入<code>pm2 start deploy.json</code></p>
+<p><img src="http://chuantu.biz/t6/356/1533977903x-1404795589.png" alt="linux-server"></p>
+<p>如果看到下面类似仪表盘的东西，恭喜你已经成功部署了前端服务器。</p>
+<blockquote>
+<p>pm2会帮你维持程序的运行防止意外挂掉，可以使用一些命令行查看程序的运行状态：<br><code>pm2 list</code>查看所有正在运行程序的状态快照<br><code>pm2 monit</code>打开监控仪表盘，监控所有运行的程序</p>
+</blockquote>
+<p>这个时候就可以访问我们部署在服务器上的网站了:<br><img src="http://chuantu.biz/t6/356/1533978560x-1404781120.png" alt="linux-server"></p>
+<blockquote>
+<ul>
+<li>如果不能访问网站可以搜索防火墙设置与端口开放的方法开放端口  </li>
+<li>阿里云等一些云服务器需配置安全策略，把一些端口设置白名单才可访问网站</li>
+</ul>
+</blockquote>
+<h1 id="后话"><a href="#后话" class="headerlink" title="后话"></a>后话</h1><p>前端单独部署，如果跟后端服务器不在一个域名或端口的话还会有跨域的问题。<br>为了解决这个问题,可以部署一个反向代理服务器，把前端的请求路由到前端服务器上，后端的请求路由到后端服务器上，对外都是只访问这个反向代理服务器，跨域问题也就迎刃而解。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/07/使用async-await异步编程/" rel="next" title="【C#】使用async&await异步编程">
+                <i class="fa fa-chevron-left"></i> 【C#】使用async&await异步编程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.gif"
+                alt="Gkeeno" />
+            
+              <p class="site-author-name" itemprop="name">Gkeeno</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#为何要部署前端服务器？"><span class="nav-number">1.1.</span> <span class="nav-text">为何要部署前端服务器？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分离前后端"><span class="nav-number">1.1.1.</span> <span class="nav-text">分离前后端</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#解耦代码"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">解耦代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解耦部署"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">解耦部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分离提升性能瓶颈"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">分离提升性能瓶颈</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为何要选择koa作为前端服务器？"><span class="nav-number">1.2.</span> <span class="nav-text">为何要选择koa作为前端服务器？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署前端服务器"><span class="nav-number">2.</span> <span class="nav-text">部署前端服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#运行环境介绍"><span class="nav-number">2.1.</span> <span class="nav-text">运行环境介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前端项目介绍"><span class="nav-number">2.2.</span> <span class="nav-text">前端项目介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署到服务器"><span class="nav-number">2.3.</span> <span class="nav-text">部署到服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#精简上传文件"><span class="nav-number">2.3.1.</span> <span class="nav-text">精简上传文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#上传到服务器"><span class="nav-number">2.3.2.</span> <span class="nav-text">上传到服务器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运行程序"><span class="nav-number">2.3.3.</span> <span class="nav-text">运行程序</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#后话"><span class="nav-number">3.</span> <span class="nav-text">后话</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Gkeeno</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
